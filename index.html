@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DVD</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      width: 100dvw;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    #dvd {
+      position: absolute;
+      height: 180px;
+      left: 0;
+      top: 0;
+    }
+  </style>
+</head>
+<body>
+  <img
+    id="dvd"
+    src="https://bouncingdvdlogo.com/logos/dvdlogo-02.svg"
+    width=""
+  />
+
+  <script>
+    const dvd = document.getElementById("dvd");
+
+
+    const imageCount = 7;
+    const images = [];
+
+    for (let i = 1; i <= imageCount; i++) {
+      const img = new Image();
+      img.src = `https://bouncingdvdlogo.com/logos/dvdlogo-0${i}.svg`;
+      images.push(img);
+    }
+
+    let x = 0;
+    let y = 0;
+    let imgnum = 0;
+    let vx = 10;
+    let vy = vx;
+
+    function update() {
+      const dvdWidth = dvd.offsetWidth;
+      const dvdHeight = dvd.offsetHeight;
+
+      const maxX = window.innerWidth - dvdWidth;
+      const maxY = window.innerHeight - dvdHeight;
+
+      x += vx;
+      y += vy;
+
+      if (x <= 0 || x >= maxX) {
+        vx *= -1;
+
+        imgnum = imgnum + 1
+        imgnum = imgnum % 7
+      }
+      if (y <= 0 || y >= maxY) {
+        vy *= -1;
+
+        imgnum = imgnum + 1
+        imgnum = imgnum % 7
+      }
+
+      dvd.style.left = x + "px";
+      dvd.style.top = y + "px";
+      dvd.src = `https://bouncingdvdlogo.com/logos/dvdlogo-0${imgnum+1}.svg`
+
+      requestAnimationFrame(update);
+    }
+
+    update();
+  </script>
+</body>
+</html>
