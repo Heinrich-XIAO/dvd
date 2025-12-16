@@ -3,81 +3,116 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DVD</title>
+  <title>DVD Grid</title>
   <style>
     body {
       margin: 0;
-      background-color: black;
+      background: black;
       width: 100dvw;
       height: 100dvh;
       overflow: hidden;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(5, 1fr);
     }
 
-    #dvd {
+    .cell {
+      position: relative;
+      overflow: hidden;
+
+      border-width:0.5px;
+      border-style:solid;
+      border-color:white;
+
+    }
+
+    .dvd {
       position: absolute;
-      height: 180px;
+      height: 36px;
       left: 0;
       top: 0;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-  <img
-    id="dvd"
-    src="https://bouncingdvdlogo.com/logos/dvdlogo-02.svg"
-    width=""
-  />
+<script>
+  const rows = 5;
+  const cols = 5;
+  const dvds = [];
+  const COLORS = 7;
 
-  <script>
-    const dvd = document.getElementById("dvd");
+  function dvdSrc(i) {
+    return `https://bouncingdvdlogo.com/logos/dvdlogo-0${i}.svg`;
+  }
 
+  for (let i = 0; i < rows * cols; i++) {
+    const cell = document.createElement("div");
+    cell.className = "cell";
 
-    const imageCount = 7;
-    const images = [];
+    const dvd = document.createElement("img");
+    dvd.className = "dvd";
 
-    for (let i = 1; i <= imageCount; i++) {
-      const img = new Image();
-      img.src = `https://bouncingdvdlogo.com/logos/dvdlogo-0${i}.svg`;
-      images.push(img);
+    const colorIndex = Math.floor(Math.random() * COLORS) + 1;
+    dvd.src = dvdSrc(colorIndex);
+
+    cell.appendChild(dvd);
+    document.body.appendChild(cell);
+
+    dvds.push({
+      el: dvd,
+      cell,
+      x: Math.random() * 20,
+      y: Math.random() * 20,
+      vx: Math.random() < 0.5 ? 1 : -1,
+      vy: Math.random() < 0.5 ? 1 : -1,
+      color: colorIndex
+    });
+  }
+
+  function changeColor(d) {
+    let next;
+    do {
+      next = Math.floor(Math.random() * COLORS) + 1;
+    } while (next === d.color);
+
+    d.color = next;
+    d.el.src = dvdSrc(next);
+  }
+
+  function update() {
+    for (const d of dvds) {
+      const cellW = d.cell.clientWidth;
+      const cellH = d.cell.clientHeight;
+      const dvdW = d.el.offsetWidth;
+      const dvdH = d.el.offsetHeight;
+
+      d.x += d.vx;
+      d.y += d.vy;
+
+      let bounced = false;
+
+      if (d.x <= 0 || d.x >= cellW - dvdW) {
+        d.vx *= -1;
+        bounced = true;
+      }
+
+      if (d.y <= 0 || d.y >= cellH - dvdH) {
+        d.vy *= -1;
+        bounced = true;
+      }
+
+      if (bounced) changeColor(d);
+
+      d.el.style.left = d.x + "px";
+      d.el.style.top = d.y + "px";
     }
 
-    let x = 0;
-    let y = 0;
-    let imgnum = 0;
-    let vx = 10;
-    let vy = vx;
+    requestAnimationFrame(update);
+  }
 
-    function update() {
-      const dvdWidth = dvd.offsetWidth;
-      const dvdHeight = dvd.offsetHeight;
+  update();
+</script>
 
-      const maxX = window.innerWidth - dvdWidth;
-      const maxY = window.innerHeight - dvdHeight;
-
-      x += vx;
-      y += vy;
-
-      if (x <= 0 || x >= maxX) {
-        vx *= -1;
-
-        imgnum = imgnum + 1
-        imgnum = imgnum % 7
-      }
-      if (y <= 0 || y >= maxY) {
-        vy *= -1;
-
-        imgnum = imgnum + 1
-        imgnum = imgnum % 7
-      }
-
-      dvd.style.left = x + "px";
-      dvd.style.top = y + "px";
-      dvd.src = `https://bouncingdvdlogo.com/logos/dvdlogo-0${imgnum+1}.svg`
-
-      requestAnimationFrame(update);
-    }
-
-    update();
-  </script>
 </body>
 </html>
